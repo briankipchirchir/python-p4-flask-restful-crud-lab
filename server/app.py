@@ -36,6 +36,38 @@ class Plants(Resource):
         db.session.commit()
 
         return make_response(new_plant.to_dict(), 201)
+    
+
+    @app.route('/plants/<int:id>', methods=['DELETE'])
+    def delete_plant(id):
+        plant = Plant.query.get(id)
+        if not plant:
+           return {"error": "Plant not found"}, 404
+    
+        db.session.delete(plant)
+        db.session.commit()
+
+        return '', 204  # No content response
+    
+
+
+    @app.route('/plants/<int:id>', methods=['PATCH'])
+    def update_plant(id):
+        plant = Plant.query.get(id)
+        if not plant:
+           return {"error": "Plant not found"}, 404
+
+        data = request.get_json()
+        is_in_stock = data.get('is_in_stock')
+
+        if is_in_stock is not None:
+          plant.is_in_stock = is_in_stock
+        db.session.commit()
+
+        return jsonify(plant.to_dict()), 200  # Make sure to return the updated plant
+
+
+    
 
 
 api.add_resource(Plants, '/plants')
